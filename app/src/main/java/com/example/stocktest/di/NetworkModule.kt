@@ -1,10 +1,14 @@
 package com.example.stocktest.di
 
+import android.content.Context
 import com.example.stocktest.*
+import com.example.stocktest.data.NetworkConnectionInterceptor
 import com.example.stocktest.data.remote.ApiService
+import com.example.stocktest.data.repository.Repository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -22,7 +26,7 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideOkHttpClient() : OkHttpClient {
+    fun provideOkHttpClient(@ApplicationContext appContext: Context) : OkHttpClient {
 
         val httpClient = OkHttpClient.Builder().apply {
             readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
@@ -32,6 +36,17 @@ object NetworkModule {
 
         if (BuildConfig.DEBUG) {
             httpClient.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+        }
+
+        httpClient
+            .addInterceptor(NetworkConnectionInterceptor(appContext))
+            .addInterceptor {
+            val request = it.request()
+                .newBuilder()
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .addHeader("Accept", "application/json")
+                .build()
+            it.proceed(request)
         }
 
         return httpClient.build()
@@ -53,7 +68,7 @@ object NetworkModule {
         return retrofit.create(ApiService::class.java)
     }
 
-//    @Singleton
-//    @Provides
-//    fun provideMainRepository(apiService:ApiService)= MainRepository(apiService)
+    @Singleton
+    @Provides
+    fun provideRepository(apiService:ApiService)= Repository(apiService)
 }

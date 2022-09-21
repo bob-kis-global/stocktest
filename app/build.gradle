@@ -93,4 +93,6 @@ dependencies {
 
     implementation "androidx.preference:preference-ktx:$preference_version"
 
+    implementation 'com.jakewharton.timber:timber:5.0.1'
+
 }

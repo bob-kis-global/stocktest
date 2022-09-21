@@ -1,7 +1,7 @@
 package com.example.stocktest
 
 open class ServerHosts {
-    open val url = "https://beta.kisvn.vn:8443"
+    open val url = "https://beta.kisvn.vn:8443/"
 
     companion object
 }

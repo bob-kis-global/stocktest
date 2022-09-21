@@ -1,6 +1,9 @@
 package com.example.stocktest.presentation.view
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -12,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -26,11 +30,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.stocktest.*
 import com.example.stocktest.R
+import com.example.stocktest.presentation.view.MainActivity.Companion.TAG
 import com.example.stocktest.presentation.viewmodel.UserState
 import com.example.stocktest.presentation.viewmodel.UserStateViewModel
 import com.example.stocktest.ui.theme.StocktestTheme
 import com.example.stocktest.ui.theme.TextFieldTextColor
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -43,11 +49,30 @@ class MainActivity : ComponentActivity() {
                 ApplicationSwitcher()
             }
         }
+
+        userState.errorMessage.observe(this) {
+            showToast(applicationContext, it)
+        }
     }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        Timber.tag(TAG).d("onConfigurationChanged()")
+    }
+
+    companion object {
+        const val TAG = "MainActivity-bob"
+    }
+}
+
+private fun showToast(context: Context, text: String){
+    Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
 }
 
 @Composable
 fun ApplicationSwitcher() {
+    Timber.tag(TAG).d("ApplicationSwitcher()")
+
     val vm = UserState.current
     if (vm.isLoggedIn) {
         StocktestTheme {
@@ -61,9 +86,12 @@ fun ApplicationSwitcher() {
 @Composable
 fun LoginScreen() {
 
-    var id by remember { mutableStateOf("") }
-    var pw by remember { mutableStateOf("") }
+    Timber.tag(TAG).d("LoginScreen()")
+
+    var name by remember { mutableStateOf("C500275") }
+    var pw by remember { mutableStateOf("a123456") }
     val vm = UserState.current
+    val context = LocalContext.current
 
     Surface(modifier = Modifier.fillMaxSize(),color = MaterialTheme.colors.background){
         Column (modifier = Modifier.fillMaxSize(),verticalArrangement = Arrangement.Center,
@@ -71,8 +99,8 @@ fun LoginScreen() {
             if (vm.isBusy) {
                 CircularProgressIndicator()
             } else {
-                TextField(value = id,
-                    onValueChange = { newInput -> id = newInput },
+                TextField(value = name,
+                    onValueChange = { newInput -> name = newInput },
                     label = {Text(text = "ID",color = MaterialTheme.colors.TextFieldTextColor)},
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     modifier = Modifier
@@ -88,7 +116,11 @@ fun LoginScreen() {
                 )
 
                 Button(onClick = {
-                    vm.signIn(id, pw)
+                    if(name.isBlank() || pw.isBlank()) {
+                        showToast(context, "아이디나 비밀번호를 확인해주세요.")
+                    } else {
+                        vm.signIn(name, pw)
+                    }
                 },modifier = Modifier
                     .padding(top = 25.dp)
                     .requiredWidth(277.dp)){
