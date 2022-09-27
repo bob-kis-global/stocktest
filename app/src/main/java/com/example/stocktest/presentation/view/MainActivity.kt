@@ -6,23 +6,30 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,28 +37,25 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.stocktest.*
 import com.example.stocktest.R
+import com.example.stocktest.data.Status
+import com.example.stocktest.data.model.Ticker
 import com.example.stocktest.presentation.view.MainActivity.Companion.TAG
-import com.example.stocktest.presentation.viewmodel.UserState
-import com.example.stocktest.presentation.viewmodel.UserStateViewModel
+import com.example.stocktest.presentation.viewmodel.LoginViewModel
+import com.example.stocktest.presentation.viewmodel.MainViewModel
 import com.example.stocktest.ui.theme.StocktestTheme
-import com.example.stocktest.ui.theme.TextFieldTextColor
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val userState by viewModels<UserStateViewModel>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            CompositionLocalProvider(UserState provides userState) {
-                ApplicationSwitcher()
+            StocktestTheme {
+                ApplicationSwitcher {
+                    // TODO
+                }
             }
-        }
-
-        userState.errorMessage.observe(this) {
-            showToast(applicationContext, it)
         }
     }
 
@@ -65,74 +69,56 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private fun showToast(context: Context, text: String){
+fun showToast(context: Context, text: String){
     Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
 }
 
 @Composable
-fun ApplicationSwitcher() {
-    Timber.tag(TAG).d("ApplicationSwitcher()")
+fun ApplicationSwitcher(viewModel: LoginViewModel = viewModel(), content: @Composable () -> Unit) {
+    Timber.tag(TAG).d("ApplicationSwitcher(0)")
 
-    val vm = UserState.current
-    if (vm.isLoggedIn) {
-        StocktestTheme {
-            MainScreenView()
+    val user by viewModel.user.observeAsState()
+    Timber.tag(TAG).d("ApplicationSwitcher(1) user = ${user?.status}")
+
+    when (user?.status) {
+        Status.LOADING -> {
+            CircularProgress()
         }
-    } else {
-        LoginScreen()
-    }
-}
-
-@Composable
-fun LoginScreen() {
-
-    Timber.tag(TAG).d("LoginScreen()")
-
-    var name by remember { mutableStateOf("C500275") }
-    var pw by remember { mutableStateOf("a123456") }
-    val vm = UserState.current
-    val context = LocalContext.current
-
-    Surface(modifier = Modifier.fillMaxSize(),color = MaterialTheme.colors.background){
-        Column (modifier = Modifier.fillMaxSize(),verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally){
-            if (vm.isBusy) {
-                CircularProgressIndicator()
+        Status.SUCCESS -> {
+            if (user?.data == null) {
+                LoginScreen()
             } else {
-                TextField(value = name,
-                    onValueChange = { newInput -> name = newInput },
-                    label = {Text(text = "ID",color = MaterialTheme.colors.TextFieldTextColor)},
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    modifier = Modifier
-                        .padding(top = 25.dp)
-                )
-
-                TextField(value = pw,
-                    onValueChange = { newInput -> pw = newInput },
-                    label = { Text(text = "Password",color = MaterialTheme.colors.TextFieldTextColor)},
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    modifier = Modifier
-                        .padding(top = 25.dp)
-                )
-
-                Button(onClick = {
-                    if(name.isBlank() || pw.isBlank()) {
-                        showToast(context, "아이디나 비밀번호를 확인해주세요.")
-                    } else {
-                        vm.signIn(name, pw)
-                    }
-                },modifier = Modifier
-                    .padding(top = 25.dp)
-                    .requiredWidth(277.dp)){
-                    Text(text = "Sign In")
-                }
+                MainScreenView()
             }
         }
+        Status.ERROR -> {
+
+        }
+        null -> {
+            LoginScreen()
+        }
     }
 }
 
 @Composable
-fun MainScreenView() {
+fun CircularProgress() {
+    Surface(modifier = Modifier.fillMaxSize(),color = MaterialTheme.colors.background) {
+        Column(
+            modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CircularProgressIndicator()
+        }
+    }
+}
+
+
+@Composable
+fun MainScreenView(viewModel: LoginViewModel = viewModel()) {
+    Timber.tag("bob").d("MainScreenView(0)")
+    val user by viewModel.user.observeAsState()
+    Timber.tag(TAG).d("MainScreenView(1) user = ${user?.status}")
+
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { BottomNavigation(navController = navController) }
@@ -145,7 +131,7 @@ fun MainScreenView() {
 
 @Composable
 fun BottomNavigation(navController: NavHostController) {
-    val items = listOf<BottomNavItem>(
+    val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.Search,
         BottomNavItem.Investment,
@@ -191,24 +177,103 @@ fun BottomNavigation(navController: NavHostController) {
 }
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(viewModel: MainViewModel = viewModel()) {
+
+    Timber.tag(TAG).d("HomeScreen(0)")
+
+    val watchList by viewModel.watchList.observeAsState()
+
+    Timber.tag(TAG).d("HomeScreen(1) ${watchList?.status}, $watchList")
+
+    when (watchList?.status) {
+        Status.LOADING -> {
+            CircularProgress()
+        }
+        Status.SUCCESS -> {
+            watchList?.data?.let {
+                MainTickerList(it)
+            }
+        }
+        Status.ERROR -> {
+            DefaultScreen(stringResource(id = R.string.home_screen))
+        }
+        null -> {
+            viewModel.getLatestSymbols()
+        }
+    }
+}
+
+@Composable
+fun MainTickerList(tickers: List<Ticker>) {
+    Surface(modifier = Modifier.fillMaxSize(),color = MaterialTheme.colors.background) {
+        Column(modifier = Modifier.padding(20.dp, 0.dp)) {
+            Text(
+                text = "Watch list",
+                modifier = Modifier.padding(start = 4.dp, top = 24.dp, end = 4.dp, bottom = 4.dp),
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp
+
+            )
+            Divider(color = Color.LightGray)
+            LazyColumn {
+                items(tickers) { ticker ->
+                    MainTicker(ticker.s, "description")
+                    Divider(color = Color(0xF000000))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MainTicker(title: String, description: String) {
+    Column(modifier = Modifier.padding(all = 8.dp)) {
+        Row {
+            Image(
+                ColorPainter(Color.Blue),
+                contentDescription = "Contact profile picture",
+                modifier = Modifier
+                    .size(16.dp)
+                    .clip(CircleShape)
+                    .align(Alignment.CenterVertically)
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Text(text = title,
+                fontSize = 20.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(text = description,
+            fontSize = 16.sp,
+            color = Color(0x80000000)
+        )
+    }
+}
+
+@Composable
+fun DefaultScreen(text: String) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.primary)
     ) {
         Text(
-            text = stringResource(id = R.string.home_screen),
+            text = text,
             style = MaterialTheme.typography.h1,
             textAlign = TextAlign.Center,
             color = Color.White,
             modifier = Modifier.align(Alignment.Center)
         )
+//        }
     }
 }
 
 @Composable
 fun SearchScreen() {
+    Timber.tag(TAG).d("SearchScreen()")
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -278,9 +343,13 @@ fun MoreScreen() {
 
 @Composable
 fun NavigationGraph(navController: NavHostController) {
+    Timber.tag("bob").d("NavigationGraph(0) = $navController")
     NavHost(navController = navController, startDestination = BottomNavItem.Home.screenRoute) {
+        Timber.tag("bob").d("NavigationGraph(1) = ${BottomNavItem.Home.screenRoute}")
         composable(BottomNavItem.Home.screenRoute) {
-            HomeScreen()
+            Timber.tag("bob").d("NavigationGraph(2)")
+            val viewModel = hiltViewModel<MainViewModel>()
+            HomeScreen(viewModel)
         }
         composable(BottomNavItem.Search.screenRoute) {
             SearchScreen()
@@ -310,6 +379,21 @@ sealed class BottomNavItem(val title: Int, val icon: Int, val screenRoute: Strin
 @Composable
 fun DefaultPreview() {
     StocktestTheme {
-        LoginScreen()
+        MainTickerList(
+            listOf(
+                Ticker(s = "VIB", t = "STOCK", o = 21450, h = 21800, l = 21050, c = 21400, a = 3202.95, ch = -900, ra = -4.04, vo = 469600, va = 1504105000.0, mv = 100, ss = "ATC",
+                    bb = listOf(Ticker.CPV(p = 21350, v = 9100, c = 0), Ticker.CPV(p = 21300, v = 21800, c = 0), Ticker.CPV(p = 21250, v = 10600, c = 0)),
+                    bo = listOf(Ticker.CPV(p = 21400, v = 2300, c = 0), Ticker.CPV(p = 21500, v = 25000, c = 0), Ticker.CPV(p = 21550, v = 18600, c = 0)),
+                    fr = Ticker.FR(bv = 0, sv = 0, tr = 432072953.0, cr = 0.0), pva = 0, pvo = 0,
+                    ba = null, ic = null, mb = null, tb = null, tc = null, to = null, tuc = null
+                ),
+                Ticker(s = "SSI", t = "STOCK", o = 21450, h = 21800, l = 21050, c = 21400, a = 3202.95, ch = -900, ra = -4.04, vo = 469600, va = 1504105000.0, mv = 100, ss = "ATC",
+                    bb = listOf(Ticker.CPV(p = 21350, v = 9100, c = 0), Ticker.CPV(p = 21300, v = 21800, c = 0), Ticker.CPV(p = 21250, v = 10600, c = 0)),
+                    bo = listOf(Ticker.CPV(p = 21400, v = 2300, c = 0), Ticker.CPV(p = 21500, v = 25000, c = 0), Ticker.CPV(p = 21550, v = 18600, c = 0)),
+                    fr = Ticker.FR(bv = 0, sv = 0, tr = 432072953.0, cr = 0.0), pva = 0, pvo = 0,
+                    ba = null, ic = null, mb = null, tb = null, tc = null, to = null, tuc = null
+                )
+            )
+        )
     }
 }

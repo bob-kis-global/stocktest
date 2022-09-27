@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class LoginResult (
     @SerializedName("accessToken") val accessToken : String,
     @SerializedName("refreshToken") val refreshToken : String,
-    @SerializedName("userInfo") val userInfo : UserInfo,
+    @SerializedName("userInfo") val userInfo : UserInfo?,
     @SerializedName("accExpiredTime") val accExpiredTime : Long,
     @SerializedName("refExpiredTime") val refExpiredTime : Long,
 ) {
@@ -31,4 +31,52 @@ data class LoginResult (
             )
         }
     }
+}
+
+
+data class Ticker(
+    @SerializedName("a") val a : Double,
+    @SerializedName("c") val c : Int,
+    @SerializedName("h") val h : Int,
+    @SerializedName("l") val l : Int,
+    @SerializedName("o") val o : Int,
+    @SerializedName("s") val s : String,
+    @SerializedName("t") val t : String?,
+    @SerializedName("ba") val ba : Int?,
+    @SerializedName("bb") val bb : List<CPV>,
+    @SerializedName("bo") val bo : List<CPV>,
+    @SerializedName("ch") val ch : Int,
+    @SerializedName("fr") val fr : FR,
+    @SerializedName("ic") val ic : List<IC>?,
+    @SerializedName("mb") val mb : String?,
+    @SerializedName("mv") val mv : Int,
+    @SerializedName("ra") val ra : Double,
+    @SerializedName("ss") val ss : String?,
+    @SerializedName("tb") val tb : Int?,
+    @SerializedName("to") val to : Int?,
+    @SerializedName("va") val va : Double,
+    @SerializedName("vo") val vo : Int,
+    @SerializedName("pva") val pva : Int,
+    @SerializedName("pvo") val pvo : Int,
+    @SerializedName("tc") val tc : Int?,
+    @SerializedName("utc") val tuc : Int?,
+) {
+    data class CPV(
+        @SerializedName("c") val c : Int,
+        @SerializedName("p") val p : Int,
+        @SerializedName("v") val v : Int,
+    )
+    data class FR(
+        @SerializedName("bv") val bv : Int,
+        @SerializedName("cr") val cr : Double,
+        @SerializedName("sv") val sv : Int,
+        @SerializedName("tr") val tr : Double,
+    )
+    data class IC(
+        @SerializedName("ce") val ce : Int,
+        @SerializedName("dw") val dw : Int,
+        @SerializedName("fl") val fl : Int,
+        @SerializedName("uc") val uc : Int,
+        @SerializedName("up") val up : Int,
+    )
 }

@@ -1,10 +1,11 @@
 package com.example.stocktest.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.example.stocktest.*
 import com.example.stocktest.data.NetworkConnectionInterceptor
 import com.example.stocktest.data.remote.ApiService
-import com.example.stocktest.data.repository.Repository
+import com.example.stocktest.data.repository.RemoteRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +20,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object NetworkModule {
+object Modules {
 
     @Provides
     fun provideBaseUrl() = ServerHosts.withPhase(Phase.BETA).url
@@ -70,5 +71,11 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideRepository(apiService:ApiService)= Repository(apiService)
+    fun provideRepository(apiService:ApiService)= RemoteRepository(apiService)
+
+    @Singleton
+    @Provides
+    fun provideSharedPreference(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences("app_preference", Context.MODE_PRIVATE)
+    }
 }
