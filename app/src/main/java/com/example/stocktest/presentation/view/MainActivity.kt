@@ -6,24 +6,17 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -177,83 +170,6 @@ fun BottomNavigation(navController: NavHostController) {
 }
 
 @Composable
-fun HomeScreen(viewModel: MainViewModel = viewModel()) {
-
-    Timber.tag(TAG).d("HomeScreen(0)")
-
-    val watchList by viewModel.watchList.observeAsState()
-
-    Timber.tag(TAG).d("HomeScreen(1) ${watchList?.status}, $watchList")
-
-    when (watchList?.status) {
-        Status.LOADING -> {
-            CircularProgress()
-        }
-        Status.SUCCESS -> {
-            watchList?.data?.let {
-                MainTickerList(it)
-            }
-        }
-        Status.ERROR -> {
-            DefaultScreen(stringResource(id = R.string.home_screen))
-        }
-        null -> {
-            viewModel.getLatestSymbols()
-        }
-    }
-}
-
-@Composable
-fun MainTickerList(tickers: List<Ticker>) {
-    Surface(modifier = Modifier.fillMaxSize(),color = MaterialTheme.colors.background) {
-        Column(modifier = Modifier.padding(20.dp, 0.dp)) {
-            Text(
-                text = "Watch list",
-                modifier = Modifier.padding(start = 4.dp, top = 24.dp, end = 4.dp, bottom = 4.dp),
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-
-            )
-            Divider(color = Color.LightGray)
-            LazyColumn {
-                items(tickers) { ticker ->
-                    MainTicker(ticker.s, "description")
-                    Divider(color = Color(0xF000000))
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun MainTicker(title: String, description: String) {
-    Column(modifier = Modifier.padding(all = 8.dp)) {
-        Row {
-            Image(
-                ColorPainter(Color.Blue),
-                contentDescription = "Contact profile picture",
-                modifier = Modifier
-                    .size(16.dp)
-                    .clip(CircleShape)
-                    .align(Alignment.CenterVertically)
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Text(text = title,
-                fontSize = 20.sp
-            )
-        }
-
-        Spacer(modifier = Modifier.height(2.dp))
-        Text(text = description,
-            fontSize = 16.sp,
-            color = Color(0x80000000)
-        )
-    }
-}
-
-@Composable
 fun DefaultScreen(text: String) {
     Box(
         modifier = Modifier
@@ -397,3 +313,4 @@ fun DefaultPreview() {
         )
     }
 }
+

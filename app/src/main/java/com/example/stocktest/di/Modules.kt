@@ -23,7 +23,10 @@ import javax.inject.Singleton
 object Modules {
 
     @Provides
-    fun provideBaseUrl() = ServerHosts.withPhase(Phase.BETA).url
+    fun providePhase() = Phase.PRODUCTION
+
+    @Provides
+    fun provideBaseUrl() = ServerHosts.withPhase(providePhase()).url
 
     @Singleton
     @Provides
