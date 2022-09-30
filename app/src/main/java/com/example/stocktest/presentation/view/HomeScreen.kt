@@ -69,9 +69,11 @@ fun MainTickerList(tickers: List<Ticker>) {
 
             )
             Divider(color = Color.LightGray)
+
+            var isClicked = remember { mutableStateOf(true) }
             LazyColumn {
                 items(tickers) { ticker ->
-                    MainTicker(ticker)
+                    MainTicker(ticker, isClicked)
                     Divider(color = Color(0xF000000))
                 }
             }
@@ -80,7 +82,7 @@ fun MainTickerList(tickers: List<Ticker>) {
 }
 
 @Composable
-fun MainTicker(ticker: Ticker) {
+fun MainTicker(ticker: Ticker, isClicked: MutableState<Boolean>) {
     Box(modifier = Modifier
         .padding(all = 8.dp)
         .fillMaxWidth()) {
@@ -118,15 +120,14 @@ fun MainTicker(ticker: Ticker) {
             Column(
                 modifier = Modifier.align(Alignment.CenterVertically)
             ) {
-                var isClicked by remember { mutableStateOf(true) }
-                val closeValue = NumberUtil.getNumberFormat(ticker.c.toLong())
-                val compactValue = NumberUtil.compactDecimalFormat(ticker.va)
+                val c = NumberUtil.getNumberFormat(ticker.c.toLong())
+                val va = NumberUtil.compactDecimalFormat(ticker.va)
 
-                Text(text = if(isClicked) closeValue else compactValue,
+                Text(text = if(isClicked.value) c else va,
                     fontSize = 16.sp,
                     color = color,
                     modifier = Modifier.align(Alignment.End)
-                        .clickable(onClick = { isClicked = !isClicked })
+                        .clickable(onClick = { isClicked.value = !isClicked.value })
                 )
 
                 Text(text = "${NumberUtil.getNumberFormat(ticker.ch.toLong())}, ${ticker.ra}%",
