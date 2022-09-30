@@ -54,11 +54,13 @@ android {
             dimension "version"
             applicationIdSuffix ".beta"
             buildConfigField "String", "PHASE", '"BETA"'
+            resValue "string", "appName", "stock(beta)"
         }
 
         production {
             dimension "version"
             buildConfigField "String", "PHASE", '"PRODUCTION"'
+            resValue "string", "appName", "stock(raal)"
         }
     }
 }
