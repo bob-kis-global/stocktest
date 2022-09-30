@@ -23,7 +23,7 @@ import timber.log.Timber
 @Composable
 fun CandleView(color: Color, c: Int, o: Int, l: Int, h: Int) {
     val tag = "CandleView-bob"
-    Timber.tag(tag).d("DrawCandle() = c : $c, o = $o, l : $l, h : $h")
+//    Timber.tag(tag).d("DrawCandle() = c : $c, o = $o, l : $l, h : $h")
 
     Box(
         modifier = Modifier
@@ -38,24 +38,24 @@ fun CandleView(color: Color, c: Int, o: Int, l: Int, h: Int) {
         ) {
             val canvasWidth = size.width
             val canvasHeight = size.height
-            val strokeWidth = 5f
+            val strokeWidth = 3f
 
             drawLine(
                 color = color,
-                start = Offset((canvasWidth+strokeWidth)/2, 0f),
-                end = Offset((canvasWidth+strokeWidth)/2, canvasHeight),
+                start = Offset((canvasWidth) / 2F, 0f),
+                end = Offset((canvasWidth) / 2F, canvasHeight),
                 strokeWidth = strokeWidth
             )
 
             val rectTop = (Integer.max(o, c).toFloat() - l) / (h - l)
             val rectBottom = (Integer.min(o, c).toFloat() - l) / (h - l)
 
-            Timber.tag(tag).d("DrawCandle(1) = rectTop : $rectTop, rectBottom = $rectBottom")
+//            Timber.tag(tag).d("DrawCandle(1) = rectTop : $rectTop, rectBottom = $rectBottom")
 
             drawRect (
                 color = color,
-                topLeft = Offset(x = (canvasWidth - (size.width / 2F)) / 2, y = (size.height - (size.height * rectTop))),
-                size = Size(width = size.width / 2F, height = size.height * (rectTop - rectBottom))
+                topLeft = Offset(x = canvasWidth / 4F, y = (canvasHeight - (canvasHeight * rectTop))),
+                size = Size(width = canvasWidth / 2F, height = canvasHeight * (rectTop - rectBottom))
             )
         }
     }

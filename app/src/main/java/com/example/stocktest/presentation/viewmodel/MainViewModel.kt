@@ -60,7 +60,10 @@ class MainViewModel @Inject constructor(
 
             for (item in WATCH_LIST) {
                 localRepository.selectMarketData(item)?.let {
-                    descriptionList.add(it[0])
+                    Timber.tag(TAG).d("getDescriptionList() : $it")
+                    if(it.isNotEmpty()) {
+                        descriptionList.add(it[0])
+                    }
                 }
             }
 
