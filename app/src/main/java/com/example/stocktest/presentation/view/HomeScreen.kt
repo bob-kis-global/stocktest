@@ -26,6 +26,7 @@ import com.example.stocktest.R
 import com.example.stocktest.data.Status
 import com.example.stocktest.data.model.Ticker
 import com.example.stocktest.presentation.viewmodel.MainViewModel
+import com.example.stocktest.utils.ColorUtil
 import com.example.stocktest.utils.NumberUtil
 import timber.log.Timber
 
@@ -51,7 +52,7 @@ fun HomeScreen(viewModel: MainViewModel = viewModel()) {
             DefaultScreen(stringResource(id = R.string.home_screen))
         }
         null -> {
-            viewModel.getLatestSymbols()
+            viewModel.getMainData()
         }
     }
 }
@@ -86,8 +87,9 @@ fun MainTicker(ticker: Ticker) {
 
         Column(modifier = Modifier.align(Alignment.CenterStart)) {
             Row {
+
                 Image(
-                    ColorPainter(Color.Blue),
+                    ColorPainter(ColorUtil.getMarketColor(ticker)),
                     contentDescription = "Contact profile picture",
                     modifier = Modifier
                         .size(16.dp)
@@ -102,21 +104,13 @@ fun MainTicker(ticker: Ticker) {
                 )
             }
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = "description0",
+            Text(text = ticker.marketData?.let { it.n1 } ?: "",
                 fontSize = 12.sp,
                 color = Color(0x80000000)
             )
         }
 
-        val color = if(ticker.o > ticker.c) {
-            // decrease
-            Color.Red
-        } else if(ticker.o < ticker.c) {
-            // increase
-            Color.Green
-        } else {
-            Color.Black
-        }
+        val color = ColorUtil.getStockColor(ticker)
 
         Row(
             modifier = Modifier.align(Alignment.TopEnd)

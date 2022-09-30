@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.stocktest.BuildConfig
 import com.example.stocktest.Phase
 import com.example.stocktest.di.Modules
 import com.example.stocktest.presentation.viewmodel.LoginViewModel
@@ -21,13 +22,13 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel()) {
     val tag = "LoginScreen-bob"
     Timber.tag(tag).d("LoginScreen()")
 
-    val testName = if(Modules.providePhase() == Phase.PRODUCTION) {
+    val testName = if(BuildConfig.PHASE == Phase.PRODUCTION.phaseName) {
         "FID2875"
     } else {
         "C500275"
     }
 
-    val testPw = if(Modules.providePhase() == Phase.PRODUCTION) {
+    val testPw = if(BuildConfig.PHASE == Phase.PRODUCTION.phaseName) {
         "josang0506!"
     } else {
         "a123456"

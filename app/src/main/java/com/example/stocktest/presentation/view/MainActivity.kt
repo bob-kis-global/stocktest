@@ -43,6 +43,7 @@ import timber.log.Timber
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             StocktestTheme {
                 ApplicationSwitcher {
@@ -301,13 +302,13 @@ fun DefaultPreview() {
                     bb = listOf(Ticker.CPV(p = 21350, v = 9100, c = 0), Ticker.CPV(p = 21300, v = 21800, c = 0), Ticker.CPV(p = 21250, v = 10600, c = 0)),
                     bo = listOf(Ticker.CPV(p = 21400, v = 2300, c = 0), Ticker.CPV(p = 21500, v = 25000, c = 0), Ticker.CPV(p = 21550, v = 18600, c = 0)),
                     fr = Ticker.FR(bv = 0, sv = 0, tr = 432072953.0, cr = 0.0), pva = 0, pvo = 0,
-                    ba = null, ic = null, mb = null, tb = null, tc = null, to = null, tuc = null
+                    ba = null, ic = null, mb = null, tb = null, tc = null, to = null, tuc = null, marketData = null
                 ),
                 Ticker(s = "SSI", t = "STOCK", o = 21450, h = 21800, l = 21050, c = 21400, a = 3202.95, ch = -900, ra = -4.04, vo = 469600, va = 1504105000.0, mv = 100, ss = "ATC",
                     bb = listOf(Ticker.CPV(p = 21350, v = 9100, c = 0), Ticker.CPV(p = 21300, v = 21800, c = 0), Ticker.CPV(p = 21250, v = 10600, c = 0)),
                     bo = listOf(Ticker.CPV(p = 21400, v = 2300, c = 0), Ticker.CPV(p = 21500, v = 25000, c = 0), Ticker.CPV(p = 21550, v = 18600, c = 0)),
                     fr = Ticker.FR(bv = 0, sv = 0, tr = 432072953.0, cr = 0.0), pva = 0, pvo = 0,
-                    ba = null, ic = null, mb = null, tb = null, tc = null, to = null, tuc = null
+                    ba = null, ic = null, mb = null, tb = null, tc = null, to = null, tuc = null, marketData = null
                 )
             )
         )

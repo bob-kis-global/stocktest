@@ -2,8 +2,10 @@ package com.example.stocktest.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.room.Room
 import com.example.stocktest.*
 import com.example.stocktest.data.NetworkConnectionInterceptor
+import com.example.stocktest.data.local.AppDatabase
 import com.example.stocktest.data.remote.ApiService
 import com.example.stocktest.data.repository.RemoteRepository
 import dagger.Module
@@ -23,10 +25,7 @@ import javax.inject.Singleton
 object Modules {
 
     @Provides
-    fun providePhase() = Phase.PRODUCTION
-
-    @Provides
-    fun provideBaseUrl() = ServerHosts.withPhase(providePhase()).url
+    fun provideBaseUrl() = ServerHosts.withPhase(BuildConfig.PHASE).url
 
     @Singleton
     @Provides
@@ -81,4 +80,16 @@ object Modules {
     fun provideSharedPreference(@ApplicationContext context: Context): SharedPreferences {
         return context.getSharedPreferences("app_preference", Context.MODE_PRIVATE)
     }
+
+    @Singleton
+    @Provides
+    fun provideDatabase(@ApplicationContext context: Context) = Room.databaseBuilder(
+        context,
+        AppDatabase::class.java,
+        "app_db"
+    ).build()
+
+    @Singleton
+    @Provides
+    fun provideAppDao(db: AppDatabase) = db.appDao()
 }

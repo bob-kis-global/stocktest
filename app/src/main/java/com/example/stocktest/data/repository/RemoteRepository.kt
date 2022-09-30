@@ -4,7 +4,7 @@ import com.example.stocktest.data.model.LoginBody
 import com.example.stocktest.data.model.LoginResult
 import com.example.stocktest.data.model.Ticker
 import com.example.stocktest.data.remote.ApiService
-import com.example.stocktest.domain.IRepository
+import com.example.stocktest.domain.IRemoteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
@@ -13,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 import timber.log.Timber
 
-class RemoteRepository(private val apiService: ApiService) : IRepository {
+class RemoteRepository(private val apiService: ApiService) : IRemoteRepository {
     override suspend fun doLogin(loginBody: LoginBody) : Flow<Result<LoginResult>> {
         return flow {
             emit(Result.loading(null))

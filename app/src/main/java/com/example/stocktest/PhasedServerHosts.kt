@@ -1,11 +1,11 @@
 package com.example.stocktest
 
-internal class PhasedServerHosts(private val phase: Phase): ServerHosts() {
+internal class PhasedServerHosts(private val phase: String): ServerHosts() {
     override val url: String
         get() = when (phase) {
-            Phase.BETA -> "https://beta.kisvn.vn:8443/"
-            Phase.PRODUCTION -> "https://trading.kisvn.vn/"
+            Phase.BETA.phaseName -> "https://beta.kisvn.vn:8443/"
+            else -> "https://trading.kisvn.vn/"
         }
 }
 
-fun ServerHosts.Companion.withPhase(phase: Phase): ServerHosts = PhasedServerHosts(phase)
+fun ServerHosts.Companion.withPhase(phase: String): ServerHosts = PhasedServerHosts(phase)

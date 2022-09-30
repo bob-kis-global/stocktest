@@ -6,11 +6,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stocktest.ACCESS_TOKEN
+import com.example.stocktest.BuildConfig
 import com.example.stocktest.Phase
 import com.example.stocktest.REFRESH_TOKEN
 import com.example.stocktest.data.Result
 import com.example.stocktest.data.model.LoginBody
 import com.example.stocktest.data.model.LoginResult
+import com.example.stocktest.data.repository.LocalRepository
 import com.example.stocktest.data.repository.RemoteRepository
 import com.example.stocktest.di.Modules
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val remoteRepository: RemoteRepository,
+    private val localRepository: LocalRepository,
     private val preferences: SharedPreferences
     ) : ViewModel() {
 
@@ -71,7 +74,7 @@ class LoginViewModel @Inject constructor(
 
     companion object {
         const val TAG = "LoginViewModel-bob"
-        val loginInfo = if(Modules.providePhase() == Phase.PRODUCTION) {
+        val loginInfo = if(BuildConfig.PHASE == Phase.PRODUCTION.phaseName) {
             LoginBody(
                 "",
                 "kis-rest",

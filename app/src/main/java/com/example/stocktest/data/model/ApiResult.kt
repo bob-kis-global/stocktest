@@ -1,5 +1,6 @@
 package com.example.stocktest.data.model
 
+import com.example.stocktest.data.local.MarketData
 import com.google.gson.annotations.SerializedName
 
 data class LoginResult (
@@ -60,6 +61,7 @@ data class Ticker(
     @SerializedName("pvo") val pvo : Int,
     @SerializedName("tc") val tc : Int?,
     @SerializedName("utc") val tuc : Int?,
+    @SerializedName("marketData") var marketData : MarketData?,
 ) {
     data class CPV(
         @SerializedName("c") val c : Int,

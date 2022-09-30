@@ -12,3 +12,6 @@ const val REFRESH_TOKEN = "ACCESS_TOKEN"
 const val READ_TIMEOUT = 10L
 const val CONNECT_TIMEOUT = 10L
 const val WRITE_TIMEOUT = 15L
+
+const val MARKET_DATA_URL = "https://trading.kisvn.vn/files/resources/market_data.json"
+const val MARKET_DATA_FILENAME = "market_data.json"

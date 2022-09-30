@@ -5,9 +5,9 @@ import com.google.gson.annotations.SerializedName
 
 enum class Phase(val phaseName: String) {
     @SerializedName("beta")
-    BETA("beta"),
+    BETA("BETA"),
     @SerializedName("production")
-    PRODUCTION("production");
+    PRODUCTION("PRODUCTION");
 
     companion object {
         /**
